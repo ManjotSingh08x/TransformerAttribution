@@ -6,8 +6,8 @@ import math
 import numpy as np
 from einops import rearrange
 import matplotlib.pyplot as plt 
-from helpers import load_pretrained
-from adjusted_layers import * 
+from modules.helpers import load_pretrained
+from modules.adjusted_layers import * 
 
 # Implement load_pretrained, trunc_normal_ (might be part of pytorch now) and to2tuple
 
