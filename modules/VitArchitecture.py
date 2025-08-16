@@ -339,6 +339,42 @@ class VitTransformer(nn.Module):
             cam = cam[:, 0, 1: ]
             return cam
 
+        elif method == "full":
+            cam, _ = self.add.relprop(cam, **kwargs)
+            cam = cam[:, 1:]
+            cam = self.patch_embed.relprop(cam, **kwargs)
+            cam = cam.sum(dim=1)
+            return cam
+        elif method == "last_layer":
+            cam = self.blocks[-1].attn.get_attn_cam()
+            cam = cam[0].reshape(-1, cam.shape[-1], cam.shape[-1])
+            if is_ablation:
+                grad = self.blocks[-1].attn.get_attn_gradients()
+                grad = grad[0].reshape(-1, grad.shape[-1], grad.shape[-1])
+                cam = grad * cam
+            cam = cam.clamp(min=0).mean(dim=0)
+            cam = cam[0, 1:]
+            return cam
+
+        elif method == "last_layer_attn":
+            cam = self.blocks[-1].attn.get_attn()
+            cam = cam[0].reshape(-1, cam.shape[-1], cam.shape[-1])
+            cam = cam.clamp(min=0).mean(dim=0)
+            cam = cam[0, 1:]
+            return cam
+
+        elif method == "second_layer":
+            cam = self.blocks[1].attn.get_attn_cam()
+            cam = cam[0].reshape(-1, cam.shape[-1], cam.shape[-1])
+            if is_ablation:
+                grad = self.blocks[1].attn.get_attn_gradients()
+                grad = grad[0].reshape(-1, grad.shape[-1], grad.shape[-1])
+                cam = grad * cam
+            cam = cam.clamp(min=0).mean(dim=0)
+            cam = cam[0, 1:]
+            return cam
+        
+
 def _conv_filter(state_dict, patch_size=16):
     out_dict = {}
     for k,v in state_dict.items():

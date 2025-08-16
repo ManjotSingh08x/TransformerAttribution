@@ -84,9 +84,6 @@ class AvgPool2d(nn.AvgPool2d, RelPropSimple):
     pass
 
 
-class Linear(nn.Linear, RelProp):
-    pass
-
 # Understood now. Normalization of Addition operation
 class Add(RelPropSimple):
     def forward(self, inputs):
